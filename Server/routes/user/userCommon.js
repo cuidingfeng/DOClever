@@ -9,6 +9,7 @@ var teamGroup=require("../../model/teamGroupModel")
 var message=require("../../model/messageModel")
 var util=require("../../util/util")
 var request=require("request");
+var requestAsync=require("../../third/requestAsync");
 var fs=require("fs")
 var path=require("path")
 var con=require("../../../config.json");
@@ -83,8 +84,7 @@ function UserCommon() {
         else
         {
             obj= await (user.findOneAsync({
-                name:name,
-                password:password
+                name:name
             },"-password -question -answer"));
         }
         if(obj)
@@ -94,6 +94,31 @@ function UserCommon() {
             await (obj.saveAsync());
         }
         return obj;
+    })
+    this.loginUxin=async ((name, password)=>{
+      const hostname = "http://branch_v2.service.ceshi.xin.com",
+            path = "/staff/login";
+      return requestAsync({
+          url: hostname + path,
+          method: "POST",
+          form: {
+            username: name,
+            pwd: password
+          }
+      }).then((result) => {
+        let body;
+        if(result.statusCode!="200"){
+          const errorMsg = "登录域账号请求失败，请稍后重试";
+          console.log(errorMsg);
+          body = {
+            code: result.statusCode,
+            msg: errorMsg
+          }
+        }else{
+          body = JSON.parse(result.body);
+        }
+        return body;
+      });
     })
 }
 

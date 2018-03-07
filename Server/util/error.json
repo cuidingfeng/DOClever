@@ -52,5 +52,6 @@
   "userAlreadyInTest":50,
   "userNotInTest":51,
   "testProjectNotFound":46,
-  "testCollectionNotFound":47
+  "testCollectionNotFound":47,
+  "loginUxinError": 48
 }

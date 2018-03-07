@@ -36,13 +36,50 @@ function User() {
             }
             else
             {
-                obj= await (this.user.updateUser(req.clientParam.name,req.clientParam.password));
+                let xinUser = await (this.user.loginUxin(req.clientParam.name,req.clientParam.password))
+                if(xinUser.code!=0){
+                  util.throw(e.loginUxinError, xinUser.msg);
+                }else{
+                  /**域账号登录成功*/
+
+                  let ret = await (user.findOneAsync({
+                      name: req.clientParam.name
+                  }));
+
+                  /**已经注册过*/
+                  if(ret)
+                  {
+                      obj= await (this.user.updateUser(req.clientParam.name,req.clientParam.password));
+                  }else{
+                    /**没有注册过*/
+                      obj = await (this.createUxin(req, xinUser));
+                  }
+                }
+
             }
             if(obj)
             {
                 if(obj.state==1)
                 {
                     req.session.userid=obj._id;
+                  //   console.log("obj===========================", JSON.stringify(obj));
+                  //   {
+                  //     "state":1,
+                  //     "loginCount":9,
+                  //     "sendInfo":{
+                  //         "user":"",
+                  //         "password":"",
+                  //         "smtp":"",
+                  //         "port":465
+                  //     },
+                  //   "_id":"5a9d2037b750e6266c54cbf7",
+                  //   "name":"cuidingfeng",
+                  //   "email":"cuidingfeng@xin.com",
+                  //   "createdAt":"2018-03-05 18:47:19",
+                  //   "updatedAt":"2018-03-07 15:07:30",
+                  //   "__v":0,
+                  //   "lastLoginDate":"2018-03-07 15:07:30"
+                  // }
                     util.ok(res,obj,"ok");
                 }
                 else
@@ -88,6 +125,38 @@ function User() {
             util.catch(res,err);
         }
     })
+    this.createUxin=async ((req, xinUser)=>{
+        try
+        {
+            let obj={
+                name:req.clientParam.name,
+                password:req.clientParam.password,
+                question: "这是域账号自动注册的",
+                answer: "请修改域账号",
+                email: xinUser.data.email,
+                photo: xinUser.data.photo,
+                phone: xinUser.data.mobile,
+                company: xinUser.data.deptname,
+                qq: xinUser.data.employee_id,
+                fullname: xinUser.data.fullname,
+                title: xinUser.data.title
+            };
+            let ret=await (user.findOneAsync({
+                name:obj.name
+            }));
+            if(ret)
+            {
+                util.throw(e.duplicateUser,"用户名重复");
+            }
+            obj=await (user.createAsync(obj));
+            delete obj._doc.password;
+            return obj;
+        }
+        catch (err)
+        {
+            util.catch(res,err);
+        }
+    })
     this.save=async ((req,res)=> {
         try
         {
@@ -127,7 +196,8 @@ function User() {
                 obj=await (user.findOneAsync({
                     _id:req.clientParam.userid
                 },"-password"))
-                util.ok(res,obj,"ok");
+                res && util.ok(res,obj,"ok");
+                return obj;
             }
             else
             {
@@ -158,7 +228,8 @@ function User() {
                 }
                 obj=await (user.createAsync(obj));
                 delete obj._doc.password;
-                util.ok(res,obj,"ok");
+                res && util.ok(res,obj,"ok");
+                return obj;
             }
         }
         catch (err)
@@ -389,13 +460,3 @@ function User() {
 }
 
 module.exports=User;
-
-
-
-
-
-
-
-
-
-
