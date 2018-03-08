@@ -96,7 +96,7 @@ function UserCommon() {
         return obj;
     })
     this.loginUxin=async ((name, password)=>{
-      const hostname = "http://branch_v2.service.ceshi.xin.com",
+      const hostname = "http://service.xin.com",
             path = "/staff/login";
       return requestAsync({
           url: hostname + path,

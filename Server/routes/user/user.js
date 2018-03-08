@@ -62,24 +62,6 @@ function User() {
                 if(obj.state==1)
                 {
                     req.session.userid=obj._id;
-                  //   console.log("obj===========================", JSON.stringify(obj));
-                  //   {
-                  //     "state":1,
-                  //     "loginCount":9,
-                  //     "sendInfo":{
-                  //         "user":"",
-                  //         "password":"",
-                  //         "smtp":"",
-                  //         "port":465
-                  //     },
-                  //   "_id":"5a9d2037b750e6266c54cbf7",
-                  //   "name":"cuidingfeng",
-                  //   "email":"cuidingfeng@xin.com",
-                  //   "createdAt":"2018-03-05 18:47:19",
-                  //   "updatedAt":"2018-03-07 15:07:30",
-                  //   "__v":0,
-                  //   "lastLoginDate":"2018-03-07 15:07:30"
-                  // }
                     util.ok(res,obj,"ok");
                 }
                 else
